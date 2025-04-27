@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <functional>
+#include <chrono>
 
 using namespace std;
 
@@ -15,7 +16,8 @@ using namespace std;
  *
  * @return int Returns 0 on successful execution.
  */
-int main() {
+int main()
+{
     // Set precision for floating-point output
     std::cout.precision(10);
 
@@ -27,11 +29,11 @@ int main() {
      * - Transformations: Resize to 32x32, Normalize with mean 0.5 and std 0.5
      */
     auto dataset = xt::data::datasets::CIFAR100(
-            "/home/kami/Documents/datasets/", DataMode::TRAIN, true,
-            {
-                    xt::data::transforms::Resize({32, 32}),
-                    torch::data::transforms::Normalize<>(0.5, 0.5)
-            }).map(torch::data::transforms::Stack<>());
+        "/home/kami/Documents/datasets/", DataMode::TRAIN, true,
+        {
+            xt::data::transforms::Resize({227, 227}),
+            torch::data::transforms::Normalize<>(0.5, 0.5)
+        }).map(torch::data::transforms::Stack<>());
 
     /**
      * Create a DataLoader for batching and shuffling the dataset.
@@ -40,16 +42,18 @@ int main() {
      * - Shuffle: Enabled
      */
     xt::DataLoader<decltype(dataset)> loader(
-            std::move(dataset),
-            torch::data::DataLoaderOptions().batch_size(64).drop_last(false),
-            true);
+        std::move(dataset),
+        torch::data::DataLoaderOptions().batch_size(64).drop_last(false),
+        true);
 
     /**
      * Initialize the LeNet-5 model for 10 classes and move it to CPU.
      * Set the model to training mode.
      */
-    xt::models::LeNet5 model(100,3);
-    model.to(torch::Device(torch::kCPU));
+    const torch::Device device = torch::Device(torch::kCUDA);
+    xt::models::VggNet16 model(100, 3);
+
+    model.to(device);
     model.train();
 
     /**
@@ -65,15 +69,24 @@ int main() {
      */
     xt::Trainer trainer;
     trainer.set_optimizer(&optimizer)
-            .set_max_epochs(5)
-            .set_loss_fn([](auto output, auto target) {
-                return torch::nll_loss(output, target);
-            });
+           .set_max_epochs(10)
+           .set_loss_fn([](auto output, auto target)
+           {
+               return torch::nll_loss(output, target);
+           });
 
     /**
      * Train the model using the Trainer and DataLoader.
      */
-    trainer.fit<decltype(dataset)>(&model, loader);
+    auto start_time = std::chrono::high_resolution_clock::now();
 
+    trainer.fit<decltype(dataset)>(&model, loader , device);
+    auto end_time = std::chrono::high_resolution_clock::now();
+
+    // Calculate the duration in microseconds
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+
+    // Output the duration in microseconds
+    std::cout << "Program execution time: " << ((double)duration.count())/1000000 << " seconds" << std::endl;
     return 0;
 }
