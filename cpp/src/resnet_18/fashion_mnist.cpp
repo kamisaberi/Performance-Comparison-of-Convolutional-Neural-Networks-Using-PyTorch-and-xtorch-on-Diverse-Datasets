@@ -51,7 +51,7 @@ int main()
      * Set the model to training mode.
      */
     const torch::Device device = torch::Device(torch::kCUDA);
-    xt::models::VggNet16 model(10 , 1);
+    xt::models::ResNet18 model({3, 4, 6, 3}, 10, 1);
 
     model.to(device);
     model.train();
