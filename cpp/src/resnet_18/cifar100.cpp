@@ -31,7 +31,7 @@ int main()
     auto dataset = xt::data::datasets::CIFAR100(
         "/home/kami/Documents/datasets/", DataMode::TRAIN, true,
         {
-            xt::data::transforms::Resize({227, 227}),
+            xt::data::transforms::Resize({224, 224}),
             torch::data::transforms::Normalize<>(0.5, 0.5)
         }).map(torch::data::transforms::Stack<>());
 
