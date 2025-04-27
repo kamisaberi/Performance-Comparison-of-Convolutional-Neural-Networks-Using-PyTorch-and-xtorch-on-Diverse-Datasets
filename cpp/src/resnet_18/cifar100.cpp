@@ -52,6 +52,7 @@ int main()
      */
     const torch::Device device = torch::Device(torch::kCUDA);
     xt::models::VggNet16 model(100, 3);
+    xt::models::ResNet18 model({3, 4, 6, 3}, 100, 3);
 
     model.to(device);
     model.train();
