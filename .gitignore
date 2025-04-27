@@ -1,0 +1,4 @@
+cmake-build-debug
+cpp/build
+cpp/cmake-build-debug
+python/.idea
