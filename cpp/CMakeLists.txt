@@ -63,6 +63,9 @@ set(TEST_LIBRARIES ${CURL_LIBRARIES}
 
 )
 
+
+#========================================================LENET5========================================================#
+
 # ----------------------------lenet5-mnist ---------------------------- #
 add_executable(lenet5-mnist src/lenet5/mnist.cpp)
 target_link_libraries(lenet5-mnist "${TORCH_LIBRARIES}")
@@ -106,3 +109,52 @@ target_link_libraries(lenet5-food101 "${TORCH_LIBRARIES}")
 set_property(TARGET lenet5-food101 PROPERTY CXX_STANDARD 17)
 target_include_directories(lenet5-food101 PRIVATE ${LIBTAR_INCLUDE_DIR} ${TORCH_INCLUDE_DIRS} ${LibArchive_INCLUDE_DIRS} ${XTORCH_INCLUDE_DIRS})
 target_link_libraries(lenet5-food101 ${TEST_LIBRARIES})
+
+
+
+
+#========================================================ALEXNET=======================================================#
+
+# ----------------------------lenet5-mnist ---------------------------- #
+add_executable(alexnet-mnist src/alexnet/mnist.cpp)
+target_link_libraries(alexnet-mnist "${TORCH_LIBRARIES}")
+set_property(TARGET alexnet-mnist PROPERTY CXX_STANDARD 17)
+target_include_directories(alexnet-mnist PRIVATE ${LIBTAR_INCLUDE_DIR} ${TORCH_INCLUDE_DIRS} ${LibArchive_INCLUDE_DIRS} ${XTORCH_INCLUDE_DIRS})
+target_link_libraries(alexnet-mnist ${TEST_LIBRARIES})
+
+
+
+# ----------------------------lenet5-fashion-mnist ---------------------------- #
+add_executable(alexnet-fashion-mnist src/alexnet/fashion_mnist.cpp)
+target_link_libraries(alexnet-fashion-mnist "${TORCH_LIBRARIES}")
+set_property(TARGET alexnet-fashion-mnist PROPERTY CXX_STANDARD 17)
+target_include_directories(alexnet-fashion-mnist PRIVATE ${LIBTAR_INCLUDE_DIR} ${TORCH_INCLUDE_DIRS} ${LibArchive_INCLUDE_DIRS} ${XTORCH_INCLUDE_DIRS})
+target_link_libraries(alexnet-fashion-mnist ${TEST_LIBRARIES})
+
+# ----------------------------lenet5-cifar10 ---------------------------- #
+add_executable(alexnet-cifar10 src/alexnet/cifar10.cpp)
+target_link_libraries(alexnet-cifar10 "${TORCH_LIBRARIES}")
+set_property(TARGET alexnet-cifar10 PROPERTY CXX_STANDARD 17)
+target_include_directories(alexnet-cifar10 PRIVATE ${LIBTAR_INCLUDE_DIR} ${TORCH_INCLUDE_DIRS} ${LibArchive_INCLUDE_DIRS} ${XTORCH_INCLUDE_DIRS})
+target_link_libraries(alexnet-cifar10 ${TEST_LIBRARIES})
+
+# ----------------------------lenet5-cifar100 ---------------------------- #
+add_executable(alexnet-cifar100 src/alexnet/cifar100.cpp)
+target_link_libraries(alexnet-cifar100 "${TORCH_LIBRARIES}")
+set_property(TARGET alexnet-cifar100 PROPERTY CXX_STANDARD 17)
+target_include_directories(alexnet-cifar100 PRIVATE ${LIBTAR_INCLUDE_DIR} ${TORCH_INCLUDE_DIRS} ${LibArchive_INCLUDE_DIRS} ${XTORCH_INCLUDE_DIRS})
+target_link_libraries(alexnet-cifar100 ${TEST_LIBRARIES})
+
+# ----------------------------lenet5-imagenette ---------------------------- #
+add_executable(alexnet-imagenette src/alexnet/imagenette.cpp)
+target_link_libraries(alexnet-imagenette "${TORCH_LIBRARIES}")
+set_property(TARGET alexnet-imagenette PROPERTY CXX_STANDARD 17)
+target_include_directories(alexnet-imagenette PRIVATE ${LIBTAR_INCLUDE_DIR} ${TORCH_INCLUDE_DIRS} ${LibArchive_INCLUDE_DIRS} ${XTORCH_INCLUDE_DIRS})
+target_link_libraries(alexnet-imagenette ${TEST_LIBRARIES})
+
+# ----------------------------lenet5-food101 ---------------------------- #
+add_executable(alexnet-food101 src/alexnet/food101.cpp)
+target_link_libraries(alexnet-food101 "${TORCH_LIBRARIES}")
+set_property(TARGET alexnet-food101 PROPERTY CXX_STANDARD 17)
+target_include_directories(alexnet-food101 PRIVATE ${LIBTAR_INCLUDE_DIR} ${TORCH_INCLUDE_DIRS} ${LibArchive_INCLUDE_DIRS} ${XTORCH_INCLUDE_DIRS})
+target_link_libraries(alexnet-food101 ${TEST_LIBRARIES})
