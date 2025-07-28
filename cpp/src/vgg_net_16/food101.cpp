@@ -1,92 +1,132 @@
-#include <torch/torch.h>
-#include <xtorch/xtorch.h>
 #include <iostream>
+#include <torch/torch.h>
 #include <vector>
-#include <functional>
-#include <chrono>
+#include <string>
+#include <algorithm> // For std::shuffle, std::iota, std::min, std::max
+#include <future>    // Not directly used in V2, but good to keep in mind for other patterns
+#include <optional>   // For torch::optional and std::optional
+#include <chrono>     // For timing in main
+#include <xtorch/xtorch.h>
+#include  <chrono>
 
 using namespace std;
 
-/**
- * @brief Main function to train a LeNet-5 model on the MNIST dataset using PyTorch.
- *
- * This program loads the MNIST dataset, applies transformations (resize and normalization),
- * creates a data loader with shuffling, initializes a LeNet-5 model, sets up an Adam optimizer,
- * and trains the model using a custom Trainer class with negative log likelihood loss.
- *
- * @return int Returns 0 on successful execution.
- */
+
 int main()
 {
-    // Set precision for floating-point output
+    int threads = 16;
     std::cout.precision(10);
+    torch::set_num_threads(16);  // Use all 16 cores
+    std::cout << "Using " << torch::get_num_threads() << " threads for LibTorch" << std::endl;
+    int epochs = 10;
 
-    /**
-     * Load and transform the MNIST training dataset.
-     * - Path: /home/kami/Documents/temp/
-     * - Mode: Training
-     * - Download: Enabled
-     * - Transformations: Resize to 32x32, Normalize with mean 0.5 and std 0.5
-     */
-    auto dataset = xt::data::datasets::Food101(
-        "/home/kami/Documents/datasets/", DataMode::TRAIN, true,
-        {
-            xt::data::transforms::Resize({227, 227}),
-            torch::data::transforms::Normalize<>(0.5, 0.5)
-        }).map(torch::data::transforms::Stack<>());
-
-    /**
-     * Create a DataLoader for batching and shuffling the dataset.
-     * - Batch size: 64
-     * - Drop last incomplete batch: False
-     * - Shuffle: Enabled
-     */
-    xt::DataLoader<decltype(dataset)> loader(
-        std::move(dataset),
-        torch::data::DataLoaderOptions().batch_size(64).drop_last(false),
-        true);
-
-    /**
-     * Initialize the LeNet-5 model for 10 classes and move it to CPU.
-     * Set the model to training mode.
-     */
-    const torch::Device device = torch::Device(torch::kCUDA);
-    xt::models::VggNet16 model(101, 3);
-
-    model.to(device);
+    std::vector<std::shared_ptr<xt::Module>> transform_list;
+    transform_list.push_back(std::make_shared<xt::transforms::image::Resize>(std::vector<int64_t>{32, 32}));
+    transform_list.push_back(
+        std::make_shared<xt::transforms::general::Normalize>(std::vector<float>{0.5}, std::vector<float>{0.5}));
+    auto compose = std::make_unique<xt::transforms::Compose>(transform_list);
+    auto dataset = xt::datasets::MNIST("/home/kami/Documents/datasets/", xt::datasets::DataMode::TRAIN, false,
+                                       std::move(compose));
+    xt::dataloaders::ExtendedDataLoader data_loader(dataset, 64, true, 16, 2);
+    xt::models::LeNet5 model(10);
+    model.to(torch::Device(torch::kCPU));
     model.train();
-
-    /**
-     * Set up the Adam optimizer with a learning rate of 1e-3.
-     */
     torch::optim::Adam optimizer(model.parameters(), torch::optim::AdamOptions(1e-3));
+    auto start_time = std::chrono::steady_clock::now();
+    for (int i = 1; i <= epochs; i++)
+    {
+        int btc = 0;
+        for (auto& batch_data : data_loader)
+        {
+            btc++;
+            auto epoch_start = std::chrono::steady_clock::now();
 
-    /**
-     * Configure the Trainer with:
-     * - Optimizer: Adam
-     * - Maximum epochs: 5
-     * - Loss function: Negative log likelihood loss
-     */
-    xt::Trainer trainer;
-    trainer.set_optimizer(&optimizer)
-           .set_max_epochs(10)
-           .set_loss_fn([](auto output, auto target)
-           {
-               return torch::nll_loss(output, target);
-           });
+            torch::Tensor data = batch_data.first;
+            torch::Tensor target = batch_data.second;
 
-    /**
-     * Train the model using the Trainer and DataLoader.
-     */
-    auto start_time = std::chrono::high_resolution_clock::now();
+            // if (btc % 20 == 0)
+            // {
+            //     auto t = std::chrono::steady_clock::now();
+            //     auto d = t - epoch_start;
+            //     auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(d);
+            //     cout << "COPY: " << btc << " DIFF:" << d.count() << endl;
+            // }
 
-    trainer.fit<decltype(dataset)>(&model, loader , device);
-    auto end_time = std::chrono::high_resolution_clock::now();
+            auto output_any = model.forward({data});
+            // if (btc % 20 == 0)
+            // {
+            //     auto t = std::chrono::steady_clock::now();
+            //     auto d = t - epoch_start;
+            //     auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(d);
+            //     cout << "FORWARD: " << btc << " DIFF:" << d.count() << endl;
+            // }
 
-    // Calculate the duration in microseconds
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
 
-    // Output the duration in microseconds
-    std::cout << "Program execution time: " << ((double)duration.count())/1000000 << " seconds" << std::endl;
+            auto output = std::any_cast<torch::Tensor>(output_any);
+            torch::Tensor loss = torch::nll_loss(output, target);
+            // if (btc % 20 == 0)
+            // {
+            //     auto t = std::chrono::steady_clock::now();
+            //     auto d = t - epoch_start;
+            //     auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(d);
+            //     cout << "LOSS: " << btc << " DIFF:" << d.count() << endl;
+            // }
+
+            loss.backward();
+            // if (btc % 20 == 0)
+            // {
+            //     auto t = std::chrono::steady_clock::now();
+            //     auto d = t - epoch_start;
+            //     auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(d);
+            //     cout << "BACKWARD: " << btc << " DIFF:" << d.count() << endl;
+            // }
+
+
+            optimizer.zero_grad();
+            // if (btc % 20 == 0)
+            // {
+            //     auto t = std::chrono::steady_clock::now();
+            //     auto d = t - epoch_start;
+            //     auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(d);
+            //     cout << "ZERO GRAD: " << btc << " DIFF:" << d.count() << endl;
+            // }
+
+            optimizer.step();
+            // if (btc % 20 == 0)
+            // {
+            //     auto t = std::chrono::steady_clock::now();
+            //     auto d = t - epoch_start;
+            //     auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(d);
+            //     cout << "STEP: " << btc << " DIFF:" << d.count() << endl;
+            // }
+
+            if (btc % 20 == 0)
+            {
+                cout << "Batch: " << btc << " Loss:" << loss.item() << endl;
+            }
+        }
+    }
+    auto end_time = std::chrono::steady_clock::now();
+    auto duration = end_time - start_time;
+    auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
+    std::cout << "Total loop duration: " << duration_ms.count() << " milliseconds." << std::endl;
+
+    // auto logger = std::make_shared<xt::LoggingCallback>("[MyTrain]", /*log_every_N_batches=*/20, /*log_time=*/true);
+    // xt::Trainer trainer;
+    //
+    // trainer.set_max_epochs(1).set_optimizer(optimizer)
+    //        .set_loss_fn([](const auto& output, const auto& target)
+    //        {
+    //            return torch::nll_loss(output, target);
+    //        })
+    //        .add_callback(logger);
+    // auto start_time = std::chrono::steady_clock::now();
+    // trainer.fit(model, data_loader, &data_loader, torch::Device(torch::kCPU));
+    //
+    // auto end_time = std::chrono::steady_clock::now();
+    // auto duration = end_time - start_time;
+    // auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
+    // std::cout << "Total loop duration: " << duration_ms.count() << " milliseconds." << std::endl;
+
     return 0;
 }
