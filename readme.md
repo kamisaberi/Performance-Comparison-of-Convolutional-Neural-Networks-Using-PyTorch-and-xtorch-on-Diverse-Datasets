@@ -5,6 +5,8 @@
 - RAM : 192 GB
 - SSD : SAMSUNG EVO 990
 
+### we trained all models during 10 epochs
+
 | model    | dataset       | pytorch | xtorch |
 |----------|---------------|---------|--------|
 | Lenet5   | MNIST         |         |        |
