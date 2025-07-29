@@ -23,17 +23,20 @@ int main()
     std::vector<std::shared_ptr<xt::Module>> transform_list;
     transform_list.push_back(std::make_shared<xt::transforms::image::Resize>(std::vector<int64_t>{32, 32}));
     transform_list.push_back(
-        std::make_shared<xt::transforms::general::Normalize>(std::vector<float>{0.5}, std::vector<float>{0.5}));
+        std::make_shared<xt::transforms::general::Normalize>(std::vector<float>{0.5,0.5,0.5}, std::vector<float>{0.5,0.5,0.5}));
     auto compose = std::make_unique<xt::transforms::Compose>(transform_list);
     auto dataset = xt::datasets::Food101("/home/kami/Documents/datasets/", xt::datasets::DataMode::TRAIN, false,
-                                       std::move(compose));
+                                         std::move(compose));
 
-
+    // for (int i = 0; i < dataset.size(); i++)
+    // {
+    //     cout << i << "  " << dataset.get(i).data.sizes() << endl;
+    // }
 
 
     xt::dataloaders::ExtendedDataLoader data_loader(dataset, 64, true, 16, 2);
 
-    xt::models::LeNet5 model(10,3);
+    xt::models::LeNet5 model(10, 3);
     model.to(torch::Device(torch::kCPU));
     model.train();
     torch::optim::Adam optimizer(model.parameters(), torch::optim::AdamOptions(1e-3));
@@ -45,7 +48,7 @@ int main()
         for (auto& batch_data : data_loader)
         {
             btc++;
-            auto epoch_start = std::chrono::steady_clock::now();
+            // auto epoch_start = std::chrono::steady_clock::now();
 
             torch::Tensor data = batch_data.first;
             torch::Tensor target = batch_data.second;
