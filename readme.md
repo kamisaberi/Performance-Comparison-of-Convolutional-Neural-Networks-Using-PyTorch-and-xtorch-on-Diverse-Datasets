@@ -14,7 +14,7 @@
 |          | CIFAR10       | 32.71   |        |
 |          | CIFAR100      | 31.99   |        |
 |          | Imagenette    | 28.68   |        |
-|          | Food101       | 819.81  |        |
+|          | Food101       | 819.81  | 275.52 |
 | AlexNet  | MNIST         |         |        |
 |          | Fashion MNIST |         |        |
 |          | CIFAR10       |         |        |
