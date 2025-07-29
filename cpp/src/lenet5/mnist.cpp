@@ -29,7 +29,8 @@ int main()
                                        std::move(compose));
     xt::dataloaders::ExtendedDataLoader data_loader(dataset, 64, true, 16, 2);
     xt::models::LeNet5 model(10);
-    model.to(torch::Device(torch::kCPU));
+    torch::Device device =   torch::Device(torch::kCUDA);
+    model.to(device);
     model.train();
     torch::optim::Adam optimizer(model.parameters(), torch::optim::AdamOptions(1e-3));
     auto start_time = std::chrono::steady_clock::now();
@@ -41,8 +42,8 @@ int main()
             btc++;
             auto epoch_start = std::chrono::steady_clock::now();
 
-            torch::Tensor data = batch_data.first;
-            torch::Tensor target = batch_data.second;
+            torch::Tensor data = batch_data.first.to(device);
+            torch::Tensor target = batch_data.second.to(device);
 
             // if (btc % 20 == 0)
             // {

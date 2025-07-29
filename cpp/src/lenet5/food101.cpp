@@ -16,8 +16,8 @@ int main()
 {
     int threads = 16;
     std::cout.precision(10);
-    torch::set_num_threads(16);  // Use all 16 cores
-    std::cout << "Using " << torch::get_num_threads() << " threads for LibTorch" << std::endl;
+    // torch::set_num_threads(16);  // Use all 16 cores
+    // std::cout << "Using " << torch::get_num_threads() << " threads for LibTorch" << std::endl;
     int epochs = 10;
 
     std::vector<std::shared_ptr<xt::Module>> transform_list;
@@ -25,7 +25,7 @@ int main()
     transform_list.push_back(
         std::make_shared<xt::transforms::general::Normalize>(std::vector<float>{0.5}, std::vector<float>{0.5}));
     auto compose = std::make_unique<xt::transforms::Compose>(transform_list);
-    auto dataset = xt::datasets::MNIST("/home/kami/Documents/datasets/", xt::datasets::DataMode::TRAIN, false,
+    auto dataset = xt::datasets::Food101("/home/kami/Documents/datasets/", xt::datasets::DataMode::TRAIN, false,
                                        std::move(compose));
     xt::dataloaders::ExtendedDataLoader data_loader(dataset, 64, true, 16, 2);
     xt::models::LeNet5 model(10);

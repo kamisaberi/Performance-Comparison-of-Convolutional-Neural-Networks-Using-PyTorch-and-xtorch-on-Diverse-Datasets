@@ -16,8 +16,8 @@ int main()
 {
     int threads = 16;
     std::cout.precision(10);
-    torch::set_num_threads(16);  // Use all 16 cores
-    std::cout << "Using " << torch::get_num_threads() << " threads for LibTorch" << std::endl;
+    // torch::set_num_threads(16); // Use all 16 cores
+    // std::cout << "Using " << torch::get_num_threads() << " threads for LibTorch" << std::endl;
     int epochs = 10;
 
     std::vector<std::shared_ptr<xt::Module>> transform_list;
@@ -28,8 +28,9 @@ int main()
     auto dataset = xt::datasets::MNIST("/home/kami/Documents/datasets/", xt::datasets::DataMode::TRAIN, false,
                                        std::move(compose));
     xt::dataloaders::ExtendedDataLoader data_loader(dataset, 64, true, 16, 2);
-    xt::models::AlexNet model(10);
-    model.to(torch::Device(torch::kCPU));
+    xt::models::AlexNet model(10, 1);
+    const torch::Device device = torch::Device(torch::kCUDA);
+    model.to(device);
     model.train();
     torch::optim::Adam optimizer(model.parameters(), torch::optim::AdamOptions(1e-3));
     auto start_time = std::chrono::steady_clock::now();
@@ -39,10 +40,10 @@ int main()
         for (auto& batch_data : data_loader)
         {
             btc++;
-            auto epoch_start = std::chrono::steady_clock::now();
+            // auto epoch_start = std::chrono::steady_clock::now();
 
-            torch::Tensor data = batch_data.first;
-            torch::Tensor target = batch_data.second;
+            torch::Tensor data = batch_data.first.to(device);
+            torch::Tensor target = batch_data.second.to(device);
 
 
             auto output_any = model.forward({data});
@@ -58,9 +59,9 @@ int main()
 
             optimizer.step();
 
-            if (btc % 20 == 0)
+            if (btc % 100 == 0)
             {
-                cout << "Batch: " << btc << " Loss:" << loss.item() << endl;
+                cout << "Epoch: " << i << "Batch: " << btc << " Loss:" << loss.item() << endl;
             }
         }
     }
