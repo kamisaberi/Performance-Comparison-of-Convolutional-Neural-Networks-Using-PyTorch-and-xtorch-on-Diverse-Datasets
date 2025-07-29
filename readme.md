@@ -9,12 +9,12 @@
 
 | model    | dataset       | pytorch | xtorch |
 |----------|---------------|---------|--------|
-| Lenet5   | MNIST         |         |        |
-|          | Fashion MNIST |         |        |
-|          | CIFAR10       |         |        |
-|          | CIFAR100      |         |        |
-|          | Imagenette    |         |        |
-|          | Food101       |         |        |
+| Lenet5   | MNIST         | 38.89   | 5.53   |
+|          | Fashion MNIST | 36.38   |        |
+|          | CIFAR10       | 32.71   |        |
+|          | CIFAR100      | 31.99   |        |
+|          | Imagenette    | 28.68   |        |
+|          | Food101       | 819.81  |        |
 | AlexNet  | MNIST         |         |        |
 |          | Fashion MNIST |         |        |
 |          | CIFAR10       |         |        |
