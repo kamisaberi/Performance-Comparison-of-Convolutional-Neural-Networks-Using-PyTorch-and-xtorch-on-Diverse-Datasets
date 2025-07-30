@@ -10,7 +10,7 @@
 | model         | dataset            | pytorch(s) | xtorch(s) |
 |---------------|--------------------|------------|-----------|
 | Lenet5        | MNIST              | 38.89      | 5.53      |
-|               | Fashion MNIST      | 36.38      |           |
+|               | Fashion MNIST      | 36.38      | 5.22      |
 |               | CIFAR10            | 32.71      |           |
 |               | CIFAR100           | 31.99      |           |
 |               | Imagenette         | 28.68      |           |
