@@ -24,8 +24,8 @@
 | VGGNet16 | MNIST         | 3099.31 |        |
 |          | Fashion MNIST | 3019.44 |        |
 |          | CIFAR10       | 2597.76 |        |
-|          | CIFAR100      |         |        |
-|          | Imagenette    |         |        |
+|          | CIFAR100      | 2536.00 |        |
+|          | Imagenette    | 447.15  |        |
 |          | Food101       |         |        |
 | ResNet18 | MNIST         | 852.04  |        |
 |          | Fashion MNIST | 824.95  |        |
