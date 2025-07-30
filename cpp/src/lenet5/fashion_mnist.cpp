@@ -25,7 +25,7 @@ int main()
     transform_list.push_back(
         std::make_shared<xt::transforms::general::Normalize>(std::vector<float>{0.5}, std::vector<float>{0.5}));
     auto compose = std::make_unique<xt::transforms::Compose>(transform_list);
-    auto dataset = xt::datasets::MNIST("/home/kami/Documents/datasets/", xt::datasets::DataMode::TRAIN, false,
+    auto dataset = xt::datasets::FashionMNIST("/home/kami/Documents/datasets/", xt::datasets::DataMode::TRAIN, false,
                                        std::move(compose));
     xt::dataloaders::ExtendedDataLoader data_loader(dataset, 64, true, 16, 2);
     xt::models::LeNet5 model(10);
@@ -39,67 +39,14 @@ int main()
         for (auto& batch_data : data_loader)
         {
             btc++;
-            auto epoch_start = std::chrono::steady_clock::now();
-
             torch::Tensor data = batch_data.first;
             torch::Tensor target = batch_data.second;
-
-            // if (btc % 20 == 0)
-            // {
-            //     auto t = std::chrono::steady_clock::now();
-            //     auto d = t - epoch_start;
-            //     auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(d);
-            //     cout << "COPY: " << btc << " DIFF:" << d.count() << endl;
-            // }
-
             auto output_any = model.forward({data});
-            // if (btc % 20 == 0)
-            // {
-            //     auto t = std::chrono::steady_clock::now();
-            //     auto d = t - epoch_start;
-            //     auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(d);
-            //     cout << "FORWARD: " << btc << " DIFF:" << d.count() << endl;
-            // }
-
-
             auto output = std::any_cast<torch::Tensor>(output_any);
             torch::Tensor loss = torch::nll_loss(output, target);
-            // if (btc % 20 == 0)
-            // {
-            //     auto t = std::chrono::steady_clock::now();
-            //     auto d = t - epoch_start;
-            //     auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(d);
-            //     cout << "LOSS: " << btc << " DIFF:" << d.count() << endl;
-            // }
-
             loss.backward();
-            // if (btc % 20 == 0)
-            // {
-            //     auto t = std::chrono::steady_clock::now();
-            //     auto d = t - epoch_start;
-            //     auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(d);
-            //     cout << "BACKWARD: " << btc << " DIFF:" << d.count() << endl;
-            // }
-
-
             optimizer.zero_grad();
-            // if (btc % 20 == 0)
-            // {
-            //     auto t = std::chrono::steady_clock::now();
-            //     auto d = t - epoch_start;
-            //     auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(d);
-            //     cout << "ZERO GRAD: " << btc << " DIFF:" << d.count() << endl;
-            // }
-
             optimizer.step();
-            // if (btc % 20 == 0)
-            // {
-            //     auto t = std::chrono::steady_clock::now();
-            //     auto d = t - epoch_start;
-            //     auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(d);
-            //     cout << "STEP: " << btc << " DIFF:" << d.count() << endl;
-            // }
-
             if (btc % 20 == 0)
             {
                 cout << "Batch: " << btc << " Loss:" << loss.item() << endl;
