@@ -18,7 +18,7 @@ int main()
     std::cout.precision(10);
     // torch::set_num_threads(16); // Use all 16 cores
     // std::cout << "Using " << torch::get_num_threads() << " threads for LibTorch" << std::endl;
-    int epochs = 10;
+    int epochs = 1;
 
     std::vector<std::shared_ptr<xt::Module>> transform_list;
     transform_list.push_back(std::make_shared<xt::transforms::image::Resize>(std::vector<int64_t>{227, 227}));
@@ -27,7 +27,7 @@ int main()
     auto compose = std::make_unique<xt::transforms::Compose>(transform_list);
     auto dataset = xt::datasets::MNIST("/home/kami/Documents/datasets/", xt::datasets::DataMode::TRAIN, false,
                                        std::move(compose));
-    xt::dataloaders::ExtendedDataLoader data_loader(dataset, 64, true, 16, 2);
+    xt::dataloaders::ExtendedDataLoader data_loader(dataset, 64, true, 32, 30);
     xt::models::AlexNet model(10, 1);
     const torch::Device device = torch::Device(torch::kCUDA);
     model.to(device);
@@ -40,8 +40,6 @@ int main()
         for (auto& batch_data : data_loader)
         {
             btc++;
-            // auto epoch_start = std::chrono::steady_clock::now();
-
             torch::Tensor data = batch_data.first.to(device);
             torch::Tensor target = batch_data.second.to(device);
 
