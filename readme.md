@@ -12,8 +12,8 @@
 | Lenet5        | MNIST              | 38.89      | 5.53      |
 |               | Fashion MNIST      | 36.38      | 5.22      |
 |               | CIFAR10            | 32.71      | 7.81      |
-|               | CIFAR100           | 31.99      | 7.00      |
-|               | Imagenette         | 28.68      |           |
+|               | CIFAR100           | 31.99      | 4.52      |
+|               | Imagenette         | 28.68      | 1.85      |
 |               | Food101            | 819.81     | 275.52    |
 | AlexNet       | MNIST              | 287.93     |           |
 |               | Fashion MNIST      | 273.77     |           |
