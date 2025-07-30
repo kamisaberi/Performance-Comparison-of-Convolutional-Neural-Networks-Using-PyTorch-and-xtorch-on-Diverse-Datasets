@@ -14,6 +14,7 @@ using namespace std;
 
 int main()
 {
+    // cout << "Hello World!" << endl;
     int epochs = 10;
     std::vector<std::shared_ptr<xt::Module>> transform_list;
     transform_list.push_back(std::make_shared<xt::transforms::image::Resize>(std::vector<int64_t>{227, 227}));
