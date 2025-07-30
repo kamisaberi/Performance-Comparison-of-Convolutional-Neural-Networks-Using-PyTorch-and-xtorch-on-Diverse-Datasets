@@ -35,7 +35,7 @@ int main()
     // }
 
 
-    xt::dataloaders::ExtendedDataLoader data_loader(dataset, 64, true, 16, 20);
+    xt::dataloaders::ExtendedDataLoader data_loader(dataset, 64, true, 32, 20);
 
     xt::models::AlexNet model(101, 3);
     torch::Device device = torch::Device(torch::kCUDA);
