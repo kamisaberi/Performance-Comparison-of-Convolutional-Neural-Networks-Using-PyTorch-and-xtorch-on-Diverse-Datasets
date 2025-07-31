@@ -18,7 +18,7 @@ int main()
     int epochs = 1;
 
     std::vector<std::shared_ptr<xt::Module>> transform_list;
-    transform_list.push_back(std::make_shared<xt::transforms::image::Resize>(std::vector<int64_t>{32, 32}));
+    transform_list.push_back(std::make_shared<xt::transforms::image::Resize>(std::vector<int64_t>{227, 227}));
     transform_list.push_back(
         std::make_shared<xt::transforms::general::Normalize>(std::vector<float>{0.5}, std::vector<float>{0.5}));
     auto compose = std::make_unique<xt::transforms::Compose>(transform_list);
