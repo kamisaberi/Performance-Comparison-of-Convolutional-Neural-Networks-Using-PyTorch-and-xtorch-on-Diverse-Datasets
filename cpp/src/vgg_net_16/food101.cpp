@@ -26,7 +26,7 @@ int main()
     auto dataset = xt::datasets::Food101("/home/kami/Documents/datasets/", xt::datasets::DataMode::TRAIN, false,
                                          std::move(compose));
     xt::dataloaders::ExtendedDataLoader data_loader(dataset, 64, true, 32, 20);
-    xt::models::VggNet16 model(10, 3);
+    xt::models::VggNet16 model(101, 3);
     torch::Device device = torch::Device(torch::kCUDA);
     model.to(device);
     model.train();
