@@ -22,11 +22,12 @@ int main()
     transform_list.push_back(
         std::make_shared<xt::transforms::general::Normalize>(std::vector<float>{0.5}, std::vector<float>{0.5}));
     auto compose = std::make_unique<xt::transforms::Compose>(transform_list);
-    auto dataset = xt::datasets::MNIST("/home/kami/Documents/datasets/", xt::datasets::DataMode::TRAIN, false,
+    auto dataset = xt::datasets::FashionMNIST("/home/kami/Documents/datasets/", xt::datasets::DataMode::TRAIN, false,
                                        std::move(compose));
     xt::dataloaders::ExtendedDataLoader data_loader(dataset, 64, true, 16, 2);
     xt::models::VggNet16 model(10, 1);
-    model.to(torch::Device(torch::kCPU));
+    torch::Device device = torch::Device(torch::kCUDA);
+    model.to(device);
     model.train();
     torch::optim::Adam optimizer(model.parameters(), torch::optim::AdamOptions(1e-3));
     auto start_time = std::chrono::steady_clock::now();
@@ -36,15 +37,15 @@ int main()
         for (auto& batch_data : data_loader)
         {
             btc++;
-            torch::Tensor data = batch_data.first;
-            torch::Tensor target = batch_data.second;
+            torch::Tensor data = batch_data.first.to(device);
+            torch::Tensor target = batch_data.second.to(device);
             auto output_any = model.forward({data});
             auto output = std::any_cast<torch::Tensor>(output_any);
             torch::Tensor loss = torch::nll_loss(output, target);
             loss.backward();
             optimizer.zero_grad();
             optimizer.step();
-            if (btc % 20 == 0)
+            if (btc % 100 == 0)
             {
                 cout << "Batch: " << btc << " Loss:" << loss.item() << endl;
             }
