@@ -14,6 +14,7 @@ using namespace std;
 
 int main()
 {
+    // cout << "Hello World:: World!" << endl;
     int threads = 16;
     std::cout.precision(10);
     // torch::set_num_threads(16);  // Use all 16 cores
@@ -21,7 +22,7 @@ int main()
     int epochs = 10;
 
     std::vector<std::shared_ptr<xt::Module>> transform_list;
-    transform_list.push_back(std::make_shared<xt::transforms::image::Resize>(std::vector<int64_t>{227, 277}));
+    transform_list.push_back(std::make_shared<xt::transforms::image::Resize>(std::vector<int64_t>{227, 227}));
     transform_list.push_back(
         std::make_shared<xt::transforms::general::Normalize>(std::vector<float>{0.5, 0.5, 0.5},
                                                              std::vector<float>{0.5, 0.5, 0.5}));
