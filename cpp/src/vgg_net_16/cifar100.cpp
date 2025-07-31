@@ -24,7 +24,7 @@ int main()
     auto compose = std::make_unique<xt::transforms::Compose>(transform_list);
     auto dataset = xt::datasets::CIFAR100("/home/kami/Documents/datasets/", xt::datasets::DataMode::TRAIN, false,
                                        std::move(compose));
-    xt::dataloaders::ExtendedDataLoader data_loader(dataset, 64, true, 16, 2);
+    xt::dataloaders::ExtendedDataLoader data_loader(dataset, 64, true, 32, 20);
     xt::models::VggNet16 model(100, 3);
     torch::Device device = torch::Device(torch::kCUDA);
     model.to(device);
@@ -45,7 +45,7 @@ int main()
             loss.backward();
             optimizer.zero_grad();
             optimizer.step();
-            if (btc % 20 == 0)
+            if (btc % 100 == 0)
             {
                 cout << "Batch: " << btc << " Loss:" << loss.item() << endl;
             }
