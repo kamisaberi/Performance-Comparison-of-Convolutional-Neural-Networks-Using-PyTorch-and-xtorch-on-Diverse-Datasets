@@ -28,7 +28,7 @@ int main()
     auto dataset = xt::datasets::MNIST("/home/kami/Documents/datasets/", xt::datasets::DataMode::TRAIN, false,
                                        std::move(compose));
     xt::dataloaders::ExtendedDataLoader data_loader(dataset, 64, true, 16, 2);
-    xt::models::LeNet5 model(10);
+    xt::models::VggNet16 model(10,1);
     model.to(torch::Device(torch::kCPU));
     model.train();
     torch::optim::Adam optimizer(model.parameters(), torch::optim::AdamOptions(1e-3));
