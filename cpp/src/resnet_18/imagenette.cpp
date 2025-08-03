@@ -47,7 +47,7 @@ int main()
             loss.backward();
             optimizer.zero_grad();
             optimizer.step();
-            if (btc % 20 == 0)
+            if (btc % 100 == 0)
             {
                 cout << "Batch: " << btc << " Loss:" << loss.item() << endl;
             }
