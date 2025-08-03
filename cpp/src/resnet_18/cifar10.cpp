@@ -15,7 +15,7 @@ using namespace std;
 int main()
 {
     std::cout.precision(10);
-    int epochs = 10;
+    int epochs = 1;
 
     std::vector<std::shared_ptr<xt::Module>> transform_list;
     transform_list.push_back(std::make_shared<xt::transforms::image::Resize>(std::vector<int64_t>{224, 224}));

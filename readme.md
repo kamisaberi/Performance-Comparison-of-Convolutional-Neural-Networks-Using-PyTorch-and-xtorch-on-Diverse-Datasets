@@ -28,7 +28,7 @@
 |               | Imagenette        | 447.15     | 435.98    |
 |               | Food101           | 3794.44    | 3621.50   |
 | ResNet18      | MNIST             | 852.04     | 734.49    |
-|               | Fashion MNIST     | 824.95     |           |
+|               | Fashion MNIST     | 824.95     | 722.41    |
 |               | CIFAR10           | 748.90     |           |
 |               | CIFAR100          | 694.50     |           |
 |               | Imagenette        | 134.17     |           |
