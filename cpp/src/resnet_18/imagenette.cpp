@@ -14,10 +14,7 @@ using namespace std;
 
 int main()
 {
-    int threads = 16;
     std::cout.precision(10);
-    torch::set_num_threads(16); // Use all 16 cores
-    std::cout << "Using " << torch::get_num_threads() << " threads for LibTorch" << std::endl;
     int epochs = 1;
 
     std::vector<std::shared_ptr<xt::Module>> transform_list;
