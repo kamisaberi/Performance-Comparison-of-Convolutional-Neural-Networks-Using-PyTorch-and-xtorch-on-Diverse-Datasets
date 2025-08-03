@@ -14,6 +14,15 @@ using namespace std;
 
 int main()
 {
+    if (torch::cuda::cudnn_is_available())
+    {
+        cout <<  "CUDNN available" << endl;
+    }
+    else
+    {
+        cout << "CUDNN not available" << endl;
+    }
+
     std::cout.precision(10);
     int epochs = 1;
 
@@ -25,7 +34,7 @@ int main()
     auto dataset = xt::datasets::MNIST("/home/kami/Documents/datasets/", xt::datasets::DataMode::TRAIN, false,
                                        std::move(compose));
     xt::dataloaders::ExtendedDataLoader data_loader(dataset, 64, true, 16, 2);
-    xt::models::ResNet18 model({3, 4, 6, 3}, 10, 1);
+    xt::models::ResNet model({3, 4, 6, 3}, 10, 1);
     torch::Device device = torch::Device(torch::kCUDA);
     model.to(device);
     model.train();
@@ -40,8 +49,9 @@ int main()
 
             torch::Tensor data = batch_data.first.to(device);
             torch::Tensor target = batch_data.second.to(device);
-            auto output_any = model.forward({data});
-            auto output = std::any_cast<torch::Tensor>(output_any);
+            auto output_any = model.forward(data);
+            // auto output = std::any_cast<torch::Tensor>(output_any);
+            auto output = output_any;
             torch::Tensor loss = torch::nll_loss(output, target);
             loss.backward();
             optimizer.zero_grad();
