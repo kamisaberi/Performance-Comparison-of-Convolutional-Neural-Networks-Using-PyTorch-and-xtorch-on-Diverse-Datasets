@@ -27,7 +27,7 @@ int main()
     xt::dataloaders::ExtendedDataLoader data_loader(dataset, 64, true, 16, 2);
     torch::Device device(torch::kCUDA);
     xt::models::ResNet model({3, 4, 6, 3}, 10, 3);
-    model.to(torch::Device(torch::kCPU));
+    model.to(device);
     model.train();
     torch::optim::Adam optimizer(model.parameters(), torch::optim::AdamOptions(1e-3));
     auto start_time = std::chrono::steady_clock::now();
