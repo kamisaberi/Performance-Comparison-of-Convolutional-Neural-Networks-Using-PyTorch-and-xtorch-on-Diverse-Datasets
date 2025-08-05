@@ -25,7 +25,7 @@ int main()
     auto compose = std::make_unique<xt::transforms::Compose>(transform_list);
     auto dataset = xt::datasets::Food101("/home/kami/Documents/datasets/", xt::datasets::DataMode::TRAIN, false,
                                          std::move(compose));
-    xt::dataloaders::ExtendedDataLoader data_loader(dataset, 64, true, 16, 2);
+    xt::dataloaders::ExtendedDataLoader data_loader(dataset, 64, true, 32, 20);
     torch::Device device(torch::kCUDA);
     xt::models::ResNet model({3, 4, 6, 3}, 101, 3);
     model.to(device);
