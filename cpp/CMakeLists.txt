@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.28 FATAL_ERROR)
 project(examples)
 
+set(CMAKE_C_COMPILER "gcc-12")
+set(CMAKE_CXX_COMPILER "g++-12")
+set(CMAKE_CUDA_HOST_COMPILER "g++-12")
+set(CMAKE_CUDA_ARCHITECTURES "75;86")
+set(CMAKE_CUDA_COMPILER /usr/local/cuda-12.8/bin/nvcc)
+
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
     message(STATUS "Setting default build type to: ${CMAKE_BUILD_TYPE}")
