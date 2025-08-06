@@ -26,7 +26,7 @@ int main()
         std::make_shared<xt::transforms::general::Normalize>(std::vector<float>{0.5, 0.5, 0.5},
                                                              std::vector<float>{0.5, 0.5, 0.5}));
     auto compose = std::make_unique<xt::transforms::Compose>(transform_list);
-    auto dataset = xt::datasets::Food101("/home/kami/Documents/datasets/", xt::datasets::DataMode::TRAIN, false,
+    auto dataset = xt::datasets::Food101("/home/kami/Documents/datasets/", xt::datasets::DataMode::TRAIN, false,true,
                                          std::move(compose));
 
     // for (int i = 0; i < dataset.size(); i++)
